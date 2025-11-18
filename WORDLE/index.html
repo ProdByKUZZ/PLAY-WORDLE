@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle - Telegram Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <button class="btn-icon menu-toggle" id="menuBtn">
+                <span class="icon">☰</span>
+            </button>
+            <h1 class="logo">WORDLE</h1>
+            <button class="btn-icon stats-toggle" id="statsBtn">
+                <span class="icon">📊</span>
+            </button>
+        </header>
+
+        <!-- Main Game -->
+        <main class="main-game">
+            <div class="game-board" id="gameBoard"></div>
+            <div class="virtual-keyboard" id="keyboard"></div>
+        </main>
+
+        <!-- Start Screen -->
+        <div class="start-screen active" id="startScreen">
+            <div class="start-content">
+                <div class="welcome-card">
+                    <h1 class="welcome-title">WORDLE</h1>
+                    <p class="welcome-subtitle">Угадай слово из 5 букв за 6 попыток</p>
+                    <div class="welcome-buttons">
+                        <button class="btn-primary start-game-btn" id="startGameBtn">
+                            <span class="btn-icon">🎮</span>
+                            Начать игру
+                        </button>
+                        <button class="btn-secondary how-to-play-btn" id="howToPlayBtn">
+                            <span class="btn-icon">❓</span>
+                            Как играть
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <div class="sidebar-menu" id="sidebarMenu">
+            <div class="sidebar-header">
+                <h3>Меню</h3>
+                <button class="btn-close" id="closeMenuBtn">×</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="game">
+                    <span class="nav-icon">🎮</span>
+                    <span class="nav-text">Игра</span>
+                </button>
+                <button class="nav-item" data-tab="friend">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Слово друга</span>
+                </button>
+                <button class="nav-item" data-tab="profile">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Мой профиль</span>
+                </button>
+                <button class="nav-item" data-tab="achievements">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Достижения</span>
+                </button>
+                <button class="nav-item" data-tab="invite">
+                    <span class="nav-icon">📤</span>
+                    <span class="nav-text">Пригласить</span>
+                </button>
+            </nav>
+
+            <div class="tab-content active" id="game-tab">
+                <div class="tab-panel">
+                    <button class="menu-btn" id="newGameBtn">
+                        <span class="btn-icon">🔄</span>
+                        Новая игра
+                    </button>
+                    <button class="menu-btn" id="howToPlayMenuBtn">
+                        <span class="btn-icon">❓</span>
+                        Как играть
+                    </button>
+                    <button class="menu-btn" id="themeBtn">
+                        <span class="btn-icon">🎨</span>
+                        Сменить тему
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="friend-tab">
+                <div class="tab-panel">
+                    <div class="friend-section">
+                        <h4>Создать слово для друга</h4>
+                        <div class="word-input-container">
+                            <input type="text" id="friendWordInput" maxlength="5" 
+                                   placeholder="Введите 5 русских букв" class="word-input">
+                            <div class="input-hint">Только существующие русские слова</div>
+                        </div>
+                        <button class="btn-primary create-word-btn" id="createFriendWordBtn">
+                            <span class="btn-icon">✨</span>
+                            Создать вызов
+                        </button>
+                    </div>
+
+                    <div class="link-section" id="friendLinkContainer" style="display: none;">
+                        <h4>Ссылка для друга</h4>
+                        <div class="link-container">
+                            <input type="text" id="friendLink" readonly class="link-input">
+                            <button class="btn-copy" id="copyFriendLinkBtn" title="Скопировать">
+                                📋
+                            </button>
+                        </div>
+                        <div class="share-buttons">
+                            <button class="btn-share telegram-share" id="shareFriendLinkBtn">
+                                <span class="btn-icon">📱</span>
+                                Поделиться в Telegram
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="friend-stats">
+                        <h4>Мои слова</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="wordsCreated">0</div>
+                                <div class="stat-label">Создано</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="wordsGuessed">0</div>
+                                <div class="stat-label">Угадано</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="profile-tab">
+                <div class="tab-panel">
+                    <div class="profile-card">
+                        <div class="avatar-container">
+                            <div class="avatar" id="profileAvatar">👤</div>
+                            <div class="level-badge">Ур. <span id="profileLevel">1</span></div>
+                        </div>
+                        <div class="profile-info">
+                            <h3 class="user-name" id="profileName">Игрок</h3>
+                            <p class="user-username" id="profileUsername">@username</p>
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <span class="stat-icon">🎮</span>
+                                    <span class="stat-text">Игр: <strong id="profileGames">0</strong></span>
+                                </div>
+                                <div class="profile-stat">
+                                    <span class="stat-icon">📅</span>
+                                    <span class="stat-text">Регистрация: <strong id="profileRegistration">-</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>Прогресс до следующего уровня</span>
+                            <span class="progress-text" id="levelProgressText">0/10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="levelProgressFill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="achievements-tab">
+                <div class="tab-panel">
+                    <div class="achievements-grid">
+                        <div class="achievement-card completed">
+                            <div class="achievement-icon">🎯</div>
+                            <div class="achievement-info">
+                                <h4>Новичок</h4>
+                                <p>Сыграйте первую игру</p>
+                            </div>
+                            <div class="achievement-badge">✅</div>
+                        </div>
+
+                        <div class="achievement-card" id="strategistAchievement">
+                            <div class="achievement-icon">🏹</div>
+                            <div class="achievement-info">
+                                <h4>Стратег</h4>
+                                <p>Выиграйте 10 игр</p>
+                                <div class="achievement-progress">
+                                    <div class="progress-bar small">
+                                        <div class="progress-fill" id="strategistProgress" style="width: 0%"></div>
+                                    </div>
+                                    <span class="progress-text" id="strategistText">0/10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="achievement-card" id="masterAchievement">
+                            <div class="achievement-icon">🌟</div>
+                            <div class="achievement-info">
+                                <h4>Мастер слов</h4>
+                                <p>Выиграйте 50 игр</p>
+                                <div class="achievement-progress">
+                                    <div class="progress-bar small">
+                                        <div class="progress-fill" id="masterProgress" style="width: 0%"></div>
+                                    </div>
+                                    <span class="progress-text" id="masterText">0/50</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="achievement-card" id="creatorAchievement">
+                            <div class="achievement-icon">🔮</div>
+                            <div class="achievement-info">
+                                <h4>Создатель</h4>
+                                <p>Создайте 5 слов для друзей</p>
+                                <div class="achievement-progress">
+                                    <div class="progress-bar small">
+                                        <div class="progress-fill" id="creatorProgress" style="width: 0%"></div>
+                                    </div>
+                                    <span class="progress-text" id="creatorText">0/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="invite-tab">
+                <div class="tab-panel">
+                    <div class="invite-card">
+                        <div class="invite-icon">👋</div>
+                        <h3>Пригласите друзей!</h3>
+                        <p>Сыграйте вместе в Wordle и соревнуйтесь в отгадывании слов</p>
+                        <button class="btn-primary invite-btn" id="shareGameBtn">
+                            <span class="btn-icon">📤</span>
+                            Поделиться игрой
+                        </button>
+                    </div>
+
+                    <div class="invite-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="invitesSent">0</div>
+                            <div class="stat-label">Приглашений отправлено</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Play Modal -->
+        <div class="modal-overlay" id="howToPlayModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Как играть в Wordle</h3>
+                    <button class="btn-close" id="closeHowToPlayBtn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Угадайте слово из 5 букв</h4>
+                            <p>У вас есть 6 попыток, чтобы отгадать загаданное слово</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Смотрите на подсказки</h4>
+                            <div class="color-examples">
+                                <div class="color-example">
+                                    <div class="example-tile correct">С</div>
+                                    <span>Буква на месте</span>
+                                </div>
+                                <div class="color-example">
+                                    <div class="example-tile present">Т</div>
+                                    <span>Буква есть в слове</span>
+                                </div>
+                                <div class="color-example">
+                                    <div class="example-tile absent">О</div>
+                                    <span>Буквы нет</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Пример отгадывания</h4>
+                            <div class="example-word">
+                                <div class="example-row">
+                                    <div class="example-tile correct">С</div>
+                                    <div class="example-tile correct">Т</div>
+                                    <div class="example-tile absent">О</div>
+                                    <div class="example-tile present">Л</div>
+                                    <div class="example-tile absent">Б</div>
+                                </div>
+                            </div>
+                            <p><strong>С, Т</strong> - на своих местах</p>
+                            <p><strong>Л</strong> - есть в слове, но в другой позиции</p>
+                            <p><strong>О, Б</strong> - нет в слове</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div class="modal-overlay" id="statsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Статистика игры</h3>
+                    <button class="btn-close" id="closeStatsBtn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-grid-large">
+                        <div class="stat-card-large">
+                            <div class="stat-value" id="gamesPlayed">0</div>
+                            <div class="stat-label">Сыграно игр</div>
+                        </div>
+                        <div class="stat-card-large">
+                            <div class="stat-value" id="winRate">0%</div>
+                            <div class="stat-label">Процент побед</div>
+                        </div>
+                        <div class="stat-card-large">
+                            <div class="stat-value" id="currentStreak">0</div>
+                            <div class="stat-label">Текущая серия</div>
+                        </div>
+                        <div class="stat-card-large">
+                            <div class="stat-value" id="maxStreak">0</div>
+                            <div class="stat-label">Лучшая серия</div>
+                        </div>
+                    </div>
+
+                    <div class="distribution-section">
+                        <h4>Распределение попыток</h4>
+                        <div class="distribution-bars" id="distributionBars">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <button class="btn-primary share-stats-btn" id="shareStatsBtn">
+                        <span class="btn-icon">📤</span>
+                        Поделиться результатом
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Message Modal -->
+        <div class="modal-overlay" id="messageModal">
+            <div class="modal-content message-modal">
+                <div class="message-header">
+                    <h3 id="messageTitle">Поздравляем!</h3>
+                </div>
+                <div class="message-body">
+                    <p id="messageText">Вы угадали слово!</p>
+                    <div class="message-word" id="messageWord"></div>
+                    <div class="game-result-share" id="gameResultShare" style="display: none;">
+                        <p>Поделитесь результатом:</p>
+                        <div class="share-grid" id="shareGrid"></div>
+                    </div>
+                </div>
+                <div class="message-footer">
+                    <button class="btn-primary" id="closeMessageBtn">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
